@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name="RiskMan",
-    version="0.1",
+    version="0.1build_18.01.07",
     author="Zero Substance Trading",
     author_email="pentsok@zerosubstance.org",
     description=("A utility to display the number of shares of a stock to purchase"
