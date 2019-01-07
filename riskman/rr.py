@@ -36,7 +36,7 @@ class RiskMan(object):
         print("\nIn order to risk ${0:.2f} dollars per trade:".format(risk))
         for s in self.stops:
 
-            print("Buy {0:-4.0f} shares for a ${1:.2f} {2:6} stop loss"
+            print("Buy {0:-4.0f} shares for a ${1:.2f} {2} stop loss."
                 .format(risk/s, s, "cent" if s < 1 else "dollar"))
 
 
@@ -55,7 +55,7 @@ class RiskMan(object):
         retMsg = "In order to risk ${0:.02f} dollars".format(riskAmount)
 
         for s in self.stops:
-            newLine = "Buy {0:-4.0f} shares for a ${1:.2f} {2:6} stop loss".format(
+            newLine = "Buy {0:-4.0f} shares for a ${1:.2f} {2} stop loss".format(
                 riskAmount/s, s, "cent" if s < 1 else "dollar")
             retMsg = retMsg + '\n' + newLine
         return retMsg
