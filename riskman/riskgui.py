@@ -32,43 +32,56 @@ def get_script_dir(follow_symlinks=True):
     return os.path.dirname(path)
 
 
+def joinBase(directory, file):
+    rel = os.path.join(directory, file)
+    p = os.path.join(get_script_dir(), rel)
+    return p
 
 class RiskManGui(QMainWindow):
     '''A mini app thing'''
 
     def __init__(self):
         super().__init__()
+        self.base_path = get_script_dir()
+
+
+
+
         self.rm = RiskMan()
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.initUI()
 
+
     def initUI(self):
         '''GUI Constructor'''
 
-        img='images/riskMask.png'
+        img = joinBase('images', 'riskMask.png')
         x = randint(0,10)
         print(x)
         if x < 8:
             print('setting to money-bag')
-            img = 'images/money-bag.png'
+            img = joinBase('images', 'money-bag.png')
         
 
         self.setWindowIcon(QIcon(img))
 
-        changeStops = QAction(QIcon('images/stop-train.png'), 'Change Stops', self)
+        img = joinBase('images', 'stop-train.png')
+        changeStops = QAction(QIcon(img), 'Change Stops', self)
         changeStops.setShortcut('Ctrl+t')
         changeStops.setStatusTip('Change the stop amounts to view.')
         changeStops.triggered.connect(self.showDialog)
         
-        setFont = QAction(QIcon('images/choose-font.png'),"Set the font", self)
+        img = joinBase('images', 'choose-font.png')
+        setFont = QAction(QIcon(img),"Set the font", self)
         setFont.setShortcut('Ctrl+f')
         setFont.setStatusTip("Set the font for the main display")
         setFont.triggered.connect(self.showFontDialog)
 
         menubar = self.menuBar()
-        settingsMenu = menubar.addMenu('&Settings')
-        settingsMenu.addAction(changeStops)
-        settingsMenu.addAction(setFont)
+        self.settingsMenu = menubar.addMenu('&Settings')
+        # settingsMenu.
+        self.settingsMenu.addAction(changeStops)
+        self.settingsMenu.addAction(setFont)
 
         self.explainString = 'Keep on top?'
 
@@ -113,8 +126,14 @@ class RiskManGui(QMainWindow):
         self.stayOnTop.toggled.connect(lambda: self.btn_clk(
             self.stayOnTop.isChecked(), self.explainLbl))
         self.risk.textChanged.connect(self.changeValue)
+        self.settingsMenu.aboutToShow.connect(self.showMenu)
 
         self.show()
+
+    def showMenu(self):
+        if self.stayOnTop.isChecked():
+            self.notOnTop.setChecked(True)
+
 
     def btn_clk(self, chk, exlbl):
         '''
@@ -128,21 +147,6 @@ class RiskManGui(QMainWindow):
             self.setWindowFlags(Qt.WindowStaysOnBottomHint)
             self.show()
 
-
-
-
-        # try:
-        # # PyInstaller creates a temp folder and stores path in _MEIPASS
-        #     base_path = sys._MEIPASS
-        # except Exception:
-        # base_path = os.path.abspath(".")
-        # base_path = os.path.dirname(os.path.abspath(__file__))
-        base_path = get_script_dir()
-
-        e = QErrorMessage(self)
-        p = os.getcwd()
-        pp = os.listdir(p)
-        e.showMessage(base_path)
 
 
     def changeValue(self, value):
@@ -163,6 +167,7 @@ class RiskManGui(QMainWindow):
         to create our own Widget. This dialog presents an edit box containing the current
         list of stops. User can edit the list to change which stops are displayed.
         '''
+             
         rm = self.rm
         stopList = rm.getStops()
 
@@ -173,6 +178,8 @@ class RiskManGui(QMainWindow):
         inputD = QInputDialog()
         inputD.setInputMode(QInputDialog.TextInput)
         inputD.setWindowTitle('Change Stops')
+        img = joinBase('images', 'stop-train.png')
+        inputD.setWindowIcon(QIcon(img))
         inputD.setLabelText('Enter a comma seperated list of stop loss amounts:')
         inputD.setTextValue(stopList)
         inputD.setFont(font)
@@ -195,7 +202,10 @@ class RiskManGui(QMainWindow):
             self.changeValue(self.risk.text())
 
     def showFontDialog(self):
-        font, ok = QFontDialog.getFont()
+        fd = QFontDialog()
+        img = joinBase('images', 'choose-font.png')
+        fd.setWindowIcon(QIcon(img))
+        font, ok = fd.getFont()
         if ok:
             self.display.setFont(font)
             self.explainLbl.setFont(font)
