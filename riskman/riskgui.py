@@ -7,18 +7,30 @@ A utility to display share sizes for a given risk amount in a trade
  '''
 
 
-import sys
-
+import os, sys, inspect
 
 from PyQt5.QtWidgets import (QWidget, QGridLayout, QLabel, QLineEdit, QRadioButton,
                              QPushButton, QApplication, QMainWindow, QInputDialog, 
-                             QAction, QErrorMessage, QMessageBox, QFontDialog)
+                             QAction, QErrorMessage, QMessageBox, QFontDialog,
+                             QErrorMessage)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon
 
 from random import randint
 from riskman.rr import RiskMan
 # pylint: disable=C0103
+
+#!/usr/bin/env python
+
+def get_script_dir(follow_symlinks=True):
+    if getattr(sys, 'frozen', False): # py2exe, PyInstaller, cx_Freeze
+        path = os.path.abspath(sys.executable)
+    else:
+        path = inspect.getabsfile(get_script_dir)
+    if follow_symlinks:
+        path = os.path.realpath(path)
+    return os.path.dirname(path)
+
 
 
 class RiskManGui(QMainWindow):
@@ -115,6 +127,23 @@ class RiskManGui(QMainWindow):
         else:
             self.setWindowFlags(Qt.WindowStaysOnBottomHint)
             self.show()
+
+
+
+
+        # try:
+        # # PyInstaller creates a temp folder and stores path in _MEIPASS
+        #     base_path = sys._MEIPASS
+        # except Exception:
+        # base_path = os.path.abspath(".")
+        # base_path = os.path.dirname(os.path.abspath(__file__))
+        base_path = get_script_dir()
+
+        e = QErrorMessage(self)
+        p = os.getcwd()
+        pp = os.listdir(p)
+        e.showMessage(base_path)
+
 
     def changeValue(self, value):
         '''
